@@ -38,7 +38,7 @@ Then use `bb help` and `bb auth` as expected in the documentation.
 
 ## Development
 
-This tool developed with help of [Github Copilot](https://copilot.github.com) :octocat:
+This tool developed with help of [Github Copilot](https://copilot.github.com) :octocat: - 2021
 
 ## License
 
