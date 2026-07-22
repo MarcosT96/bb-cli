@@ -84,6 +84,26 @@ impl Client {
         self.send(method, url, None, true)
     }
 
+    /// A raw (non-repo-scoped) request to an arbitrary API path, returning the
+    /// response body text verbatim. Powers `bb api`: the endpoint is used as
+    /// given (after the caller resolves placeholders), the auth header is
+    /// attached, and the status ladder still applies. The body is not parsed —
+    /// callers decide whether to pretty-print it as JSON.
+    pub fn request_api(
+        &self,
+        method: Method,
+        endpoint: &str,
+        payload: Option<&Value>,
+    ) -> Result<String> {
+        self.send(method, endpoint, payload, false)
+    }
+
+    /// The `--project`/git-resolved `owner/repo`, if resolvable. Used by
+    /// `bb api` to substitute the `{repo}` / `{workspace}` placeholders.
+    pub fn resolve_repo(&self) -> Result<String> {
+        repo::repo_path(self.project.as_deref())
+    }
+
     /// A repo-scoped mutation whose response we don't need.
     pub fn request_discard(
         &self,

@@ -1,5 +1,6 @@
 //! Command handlers — one module per action group, mirroring `src/Actions/*`.
 
+pub mod api;
 pub mod auth;
 pub mod branch;
 pub mod browse;
