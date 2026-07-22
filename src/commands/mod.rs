@@ -8,4 +8,5 @@ pub mod env;
 pub mod pipeline;
 pub mod pr;
 pub mod pr_details;
+pub mod repo;
 pub mod upgrade;

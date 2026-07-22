@@ -37,6 +37,7 @@ fn run(cli: Cli) -> Result<()> {
         Command::Env(args) => commands::env::run(args, &cli.global),
         Command::Pipeline(args) => commands::pipeline::run(args, &cli.global),
         Command::Pr(args) => commands::pr::run(args, &cli.global),
+        Command::Repo(args) => commands::repo::run(args, &cli.global),
         Command::PrDetails(args) => commands::pr_details::run(args, &cli.global),
         Command::Upgrade(args) => commands::upgrade::run(args, &cli.global),
     }
