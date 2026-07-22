@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- `bb env create <name> [--env-type Test|Staging|Production]` — create a
+  deployment environment (requires an `admin:pipeline:bitbucket` token).
+  Resolves a long-standing gap from the original project (issue bb-cli/bb-cli#24).
+
 ## [0.3.0]
 
 ### Added

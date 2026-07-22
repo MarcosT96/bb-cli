@@ -261,6 +261,15 @@ pub enum EnvCmd {
     /// List environments. Default action.
     #[command(visible_alias = "l")]
     List,
+    /// Create an environment. Requires an API token with the
+    /// `admin:pipeline:bitbucket` scope.
+    #[command(name = "create", visible_alias = "n")]
+    Create {
+        name: String,
+        /// Environment type: Test, Staging, or Production.
+        #[arg(long, default_value = "Test")]
+        env_type: String,
+    },
     /// List variables of an environment.
     #[command(visible_alias = "v")]
     Variables { env_uuid: String },

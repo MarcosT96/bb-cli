@@ -16,6 +16,7 @@ pub fn run(args: EnvArgs, global: &GlobalArgs) -> Result<()> {
     let client = Client::new(global.project.clone())?;
     match args.cmd.unwrap_or(EnvCmd::List) {
         EnvCmd::List => list(&client),
+        EnvCmd::Create { name, env_type } => create_environment(&client, &name, &env_type),
         EnvCmd::Variables { env_uuid } => variables(&client, &env_uuid),
         EnvCmd::CreateVariable {
             env_uuid,
@@ -31,6 +32,43 @@ pub fn run(args: EnvArgs, global: &GlobalArgs) -> Result<()> {
             secured,
         } => update_variable(&client, &env_uuid, &var_uuid, &key, &value, secured),
     }
+}
+
+/// Create a deployment environment. The `environment_type` object needs a
+/// `name`/`rank`/`type`; Bitbucket ranks Test=0, Staging=1, Production=2.
+/// Requires an API token with the `admin:pipeline:bitbucket` scope.
+fn create_environment(client: &Client, name: &str, env_type: &str) -> Result<()> {
+    let rank = match env_type.to_lowercase().as_str() {
+        "staging" => 1,
+        "production" | "prod" => 2,
+        _ => 0, // Test (default)
+    };
+    // Normalize the display name to Bitbucket's canonical casing.
+    let type_name = match rank {
+        1 => "Staging",
+        2 => "Production",
+        _ => "Test",
+    };
+    let payload = json!({
+        "name": name,
+        "environment_type": {
+            "name": type_name,
+            "rank": rank,
+            "type": "deployment_environment_type"
+        }
+    });
+    let env = client.request_value(Method::POST, "/environments", Some(&payload), true)?;
+    output::line(
+        &format!(
+            "Created environment \"{}\" ({type_name})",
+            field(&env, "name")
+        ),
+        "green",
+    );
+    if let Some(uuid) = env.get("uuid").and_then(Value::as_str) {
+        output::line(uuid, "cyan");
+    }
+    Ok(())
 }
 
 fn list(client: &Client) -> Result<()> {
