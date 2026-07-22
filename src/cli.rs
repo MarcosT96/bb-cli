@@ -43,6 +43,8 @@ pub struct GlobalArgs {
 pub enum Command {
     /// Make an authenticated request to any Bitbucket API endpoint.
     Api(ApiArgs),
+    /// Define command shortcuts.
+    Alias(AliasArgs),
     /// Authentication commands.
     Auth(AuthArgs),
     /// Branch commands.
@@ -86,6 +88,26 @@ pub struct ApiArgs {
     /// Read the request body from a JSON file (or "-" for stdin).
     #[arg(long)]
     pub input: Option<String>,
+}
+
+// ---- alias ----------------------------------------------------------------
+
+#[derive(Debug, Args)]
+pub struct AliasArgs {
+    #[command(subcommand)]
+    pub cmd: Option<AliasCmd>,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum AliasCmd {
+    /// List all aliases. Default action.
+    #[command(visible_alias = "l")]
+    List,
+    /// Set an alias: bb alias set <name> "<expansion>". Use $1..$N for args.
+    Set { name: String, expansion: String },
+    /// Delete an alias.
+    #[command(visible_alias = "rm")]
+    Delete { name: String },
 }
 
 // ---- auth -----------------------------------------------------------------
