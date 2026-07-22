@@ -20,7 +20,8 @@ use cli::{Cli, Command};
 use error::Result;
 
 fn main() {
-    let cli = Cli::parse();
+    let argv = commands::alias::expand_argv(std::env::args().collect());
+    let cli = Cli::parse_from(argv);
 
     if let Err(err) = run(cli) {
         eprintln!("{}", err.to_string().red());
@@ -31,6 +32,7 @@ fn main() {
 fn run(cli: Cli) -> Result<()> {
     match cli.command {
         Command::Api(args) => commands::api::run(args, &cli.global),
+        Command::Alias(args) => commands::alias::run(args),
         Command::Auth(args) => commands::auth::run(args, &cli.global),
         Command::Branch(args) => commands::branch::run(args, &cli.global),
         Command::Browse(args) => commands::browse::run(args, &cli.global),

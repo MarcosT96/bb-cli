@@ -23,6 +23,10 @@ pub struct Config {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub auth: Option<Auth>,
 
+    /// User-defined command aliases: name -> expansion template.
+    #[serde(default, skip_serializing_if = "std::collections::BTreeMap::is_empty")]
+    pub aliases: std::collections::BTreeMap<String, String>,
+
     #[serde(flatten)]
     pub extra: serde_json::Map<String, serde_json::Value>,
 }
