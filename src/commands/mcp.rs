@@ -320,3 +320,55 @@ fn substitute(endpoint: &str, client: &Client) -> AppResult<String> {
                     begins with DESTRUCTIVE modify data — confirm with the user first."
 )]
 impl ServerHandler for BitbucketMcp {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A client with a fixed repo override, so `substitute` can resolve
+    /// `{repo}`/`{workspace}` without touching git or config.
+    fn client() -> Client {
+        Client::with_base(
+            "https://example.test",
+            "me@example.com",
+            "tok",
+            Some("acme/widgets".to_string()),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn substitutes_repo_and_workspace() {
+        let c = client();
+        assert_eq!(
+            substitute("/repositories/{repo}/pullrequests", &c).unwrap(),
+            "/repositories/acme/widgets/pullrequests"
+        );
+        assert_eq!(
+            substitute("/workspaces/{workspace}/projects", &c).unwrap(),
+            "/workspaces/acme/projects"
+        );
+    }
+
+    #[test]
+    fn adds_leading_slash() {
+        let c = client();
+        assert_eq!(substitute("user", &c).unwrap(), "/user");
+    }
+
+    #[test]
+    fn strips_redundant_2_0_prefix() {
+        let c = client();
+        assert_eq!(
+            substitute("/2.0/repositories/x/y", &c).unwrap(),
+            "/repositories/x/y"
+        );
+        assert_eq!(substitute("/2.0", &c).unwrap(), "/");
+    }
+
+    #[test]
+    fn leaves_plain_paths_untouched() {
+        let c = client();
+        assert_eq!(substitute("/user", &c).unwrap(), "/user");
+    }
+}
