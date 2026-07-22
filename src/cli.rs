@@ -51,6 +51,8 @@ pub enum Command {
     Browse(BrowseArgs),
     /// Deployment environment commands.
     Env(EnvArgs),
+    /// Issue commands.
+    Issue(IssueArgs),
     /// Pipeline commands.
     Pipeline(PipelineArgs),
     /// Pull request commands.
@@ -181,6 +183,40 @@ pub enum EnvCmd {
         #[arg(default_value_t = false)]
         secured: bool,
     },
+}
+
+// ---- issue ----------------------------------------------------------------
+
+#[derive(Debug, Args)]
+pub struct IssueArgs {
+    #[command(subcommand)]
+    pub cmd: Option<IssueCmd>,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum IssueCmd {
+    /// List issues. Default action.
+    #[command(visible_alias = "l")]
+    List {
+        /// Filter by state (new, open, resolved, closed, ...).
+        #[arg(long)]
+        state: Option<String>,
+    },
+    /// View an issue by id.
+    #[command(visible_alias = "v")]
+    View { id: u32 },
+    /// Create an issue.
+    Create {
+        title: String,
+        /// Issue body.
+        #[arg(long)]
+        body: Option<String>,
+    },
+    /// Comment on an issue.
+    #[command(visible_alias = "c")]
+    Comment { id: u32, body: String },
+    /// Close (resolve) an issue.
+    Close { id: u32 },
 }
 
 // ---- pipeline -------------------------------------------------------------
