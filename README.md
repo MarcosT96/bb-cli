@@ -1,45 +1,114 @@
-# Bitbucket Rest API CLI
+# bb — Bitbucket CLI
 
-Use Bitbucket from command line. With this app you can see pull request, pipelines, branches etc. from your terminal.
+Use Bitbucket from the command line: browse pull requests, pipelines, branches,
+deployment environments and more, straight from your terminal.
 
 ![Bitbucket CLI](ss.gif)
 
+`bb` is a single static binary written in Rust — no runtime to install, no
+dependencies to manage. It authenticates with Atlassian API tokens (the
+replacement for the now-removed Bitbucket app passwords).
+
+> **Heads up:** this is a Rust rewrite of the original PHP `bb-cli`. The commands
+> and config file are compatible, but authentication now uses an Atlassian API
+> token **with Bitbucket scopes** instead of an app password. See
+> [Acknowledgements](#acknowledgements) for the project's history.
+
 ## Installation
 
-__NOTE__: Before install this package, you should have **PHP >= 7** installed on your machine. For an alternative, use Docker instructions below.
+### 1. Install script (recommended)
 
-* Download standalone binary from [releases](https://github.com/bb-cli/bb-cli/releases)
-* Move downloaded file to path like `mv bb /usr/local/bin/bb` or `mv bb ~/.local/bin/bb`
-* For testing `bb help`
-* Let's move on to the [auth.](https://bb-cli.github.io/authentication)
+One-liner that detects your OS/arch and installs the latest release binary:
 
-## Docker Setup
-As an alternative to having a PHP runtime installed locally, you can make use of a Docker container to run Bitbucket CLI.
-First, make sure to create `~/.bitbucket-rest-cli-config.json` beforehand:
-```shell
-touch ~/.bitbucket-rest-cli-config.json
+```sh
+curl -fsSL https://raw.githubusercontent.com/MarcosT96/bb-cli/main/install.sh | sh
 ```
 
-Then, run the tool:
-```shell
-docker run -it --rm --mount type=bind,source="$HOME/.bitbucket-rest-cli-config.json",target=/root/.bitbucket-rest-cli-config.json --mount type=bind,source="$(pwd)",target=/workdir,readonly ghcr.io/bb-cli/bb-cli help
+Installs `bb` to `/usr/local/bin` (or `~/.local/bin` if that isn't writable —
+make sure it's on your `PATH`). Prebuilt binaries are provided for:
+
+- macOS (Apple Silicon & Intel)
+- Linux (x86_64 & aarch64)
+
+### 2. From source with Cargo
+
+Requires a Rust toolchain ([rustup](https://rustup.rs)):
+
+```sh
+# From a clone
+cargo install --path .
+
+# Or straight from git
+cargo install --git https://github.com/MarcosT96/bb-cli
 ```
 
-For ease, configure this as an alias in your chosen shell:
-```shell
-alias bb='docker run -it --rm --mount type=bind,source="$HOME/.bitbucket-rest-cli-config.json",target=/root/.bitbucket-rest-cli-config.json --mount type=bind,source="$(pwd)",target=/workdir,readonly ghcr.io/bb-cli/bb-cli'
+### 3. Download a binary manually
+
+Grab the asset for your platform from the
+[latest release](https://github.com/MarcosT96/bb-cli/releases/latest),
+named `bb-<target>` (e.g. `bb-aarch64-apple-darwin`), then:
+
+```sh
+chmod +x bb-<target>
+mv bb-<target> /usr/local/bin/bb
 ```
 
-Then use `bb help` and `bb auth` as expected in the documentation.
+Then run `bb --help`, and set up authentication with `bb auth save`
+(you'll need an Atlassian API token created **with Bitbucket scopes**).
+
+### Updating
+
+Once installed, `bb` self-updates:
+
+```sh
+bb upgrade
+```
+
+This checks the latest GitHub release, compares versions with semver, and — if
+newer — downloads and atomically replaces the running binary in place.
 
 ## Usage
 
-[View the documentation](https://bb-cli.github.io) for usage information.
+Run `bb --help` (or `bb <command> --help`) to see every command and its options.
+The command surface mirrors the original tool — `auth`, `branch`, `browse`,
+`env`, `pipeline`, `pr`, `pr-details`, and `upgrade`.
 
-## Development
+## Roadmap
 
-This tool developed with help of [Github Copilot](https://copilot.github.com) :octocat: - 2021
+The rewrite to a dependency-free Rust binary is the foundation for where this
+project is headed. The direction — not a set of dated promises, but the way we
+want to grow it:
+
+- **An MCP server.** Expose Bitbucket to AI assistants through the
+  [Model Context Protocol](https://modelcontextprotocol.io), so tools like
+  Claude can read PRs, inspect pipelines, and act on a repo through a safe,
+  typed interface — reusing the same client this CLI is built on.
+- **AI-assisted workflows.** Summarizing pull requests and review threads,
+  drafting PR descriptions, triaging pipeline failures, and surfacing what needs
+  attention across a repo.
+- **Broader Bitbucket coverage.** More of the Bitbucket API surface —
+  deployments, repository and project administration, webhooks, permissions,
+  and other endpoints not yet wrapped.
+
+Ideas and contributions in these directions are very welcome — open an issue to
+start a conversation.
+
+## Acknowledgements
+
+This project stands on the shoulders of the original **[bb-cli](https://github.com/bb-cli/bb-cli)**,
+a PHP tool created and maintained by **Semih Erdoğan**, with significant work by
+**Dinçer Demircioğlu** and contributions from **Erşan Işık**, **Celal Akyüz**,
+and others. Their design — the command structure, the config format, and the
+overall UX — shaped this tool directly; the Rust version is a faithful port of
+their work, undertaken to drop the runtime dependency and adopt Bitbucket's new
+API-token authentication. Thank you for building the original and sharing it
+openly. 🙏
+
+## Contributing
+
+Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE) for more information.
+The MIT License (MIT). Please see [the License file](LICENSE) for more
+information.

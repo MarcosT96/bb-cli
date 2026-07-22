@@ -1,6 +1,7 @@
 The MIT License (MIT)
 
-Copyright (c) 2021  <BB CLI>
+Copyright (c) 2021 BB CLI contributors (original PHP project)
+Copyright (c) 2026 Marcos Tomassi (Rust rewrite)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
