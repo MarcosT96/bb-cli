@@ -50,25 +50,36 @@ fi
 chmod +x "$tmp"
 
 # --- Install location ---
-# Prefer /usr/local/bin; fall back to ~/.local/bin if it isn't writable.
-dest_dir="/usr/local/bin"
-if [ ! -w "$dest_dir" ] && [ "$(id -u)" -ne 0 ]; then
-  if command -v sudo >/dev/null 2>&1; then
-    echo "Installing to $dest_dir (requires sudo) ..."
-    sudo mv "$tmp" "${dest_dir}/${BIN}"
-  else
-    dest_dir="${HOME}/.local/bin"
-    mkdir -p "$dest_dir"
-    mv "$tmp" "${dest_dir}/${BIN}"
-    echo "Installed to ${dest_dir}/${BIN}"
-    echo "Note: make sure '${dest_dir}' is on your PATH:"
-    echo '  export PATH="$HOME/.local/bin:$PATH"'
-    echo "bb installed. Run 'bb --help' to get started."
-    exit 0
-  fi
-else
+# Install to ~/.local/bin, printing a PATH reminder. Used as the fallback
+# whenever a system-wide install isn't possible.
+user_install() {
+  dest_dir="${HOME}/.local/bin"
+  mkdir -p "$dest_dir"
   mv "$tmp" "${dest_dir}/${BIN}"
-fi
+  echo "Installed ${BIN} to ${dest_dir}/${BIN}"
+  echo "Note: make sure '${dest_dir}' is on your PATH:"
+  echo '  export PATH="$HOME/.local/bin:$PATH"'
+  echo "Run 'bb --help' to get started."
+}
 
-echo "Installed ${BIN} to ${dest_dir}/${BIN}"
-echo "Run 'bb --help' to get started."
+# Prefer /usr/local/bin, then sudo, then a user-local install. Each step is
+# non-fatal: if it can't complete, we fall through to the next option rather
+# than aborting under `set -e`.
+dest_dir="/usr/local/bin"
+if [ -w "$dest_dir" ] || [ "$(id -u)" -eq 0 ]; then
+  mv "$tmp" "${dest_dir}/${BIN}"
+  echo "Installed ${BIN} to ${dest_dir}/${BIN}"
+  echo "Run 'bb --help' to get started."
+elif command -v sudo >/dev/null 2>&1 && sudo -n true >/dev/null 2>&1; then
+  # Passwordless sudo available — use it.
+  sudo mv "$tmp" "${dest_dir}/${BIN}"
+  echo "Installed ${BIN} to ${dest_dir}/${BIN}"
+  echo "Run 'bb --help' to get started."
+elif command -v sudo >/dev/null 2>&1 && sudo mv "$tmp" "${dest_dir}/${BIN}" 2>/dev/null; then
+  # Interactive sudo succeeded.
+  echo "Installed ${BIN} to ${dest_dir}/${BIN}"
+  echo "Run 'bb --help' to get started."
+else
+  # No writable system dir and no usable sudo — install for the current user.
+  user_install
+fi

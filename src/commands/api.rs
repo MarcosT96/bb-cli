@@ -26,9 +26,47 @@ pub fn run(args: ApiArgs, global: &GlobalArgs) -> Result<()> {
         None => Method::GET,
     };
 
+    if args.paginate {
+        return paginate(&client, method, &endpoint);
+    }
+
     let response = client.request_api(method, &endpoint, body.as_ref())?;
     print_response(&response);
     Ok(())
+}
+
+/// Follow `next` links across a paginated collection, accumulating every page's
+/// `values` into a single JSON array that is printed at the end.
+fn paginate(client: &Client, method: Method, first_endpoint: &str) -> Result<()> {
+    let mut all: Vec<Value> = Vec::new();
+    let mut endpoint = first_endpoint.to_string();
+    // Safety cap mirroring the comment paginator: 1000 pages.
+    for _ in 0..1000 {
+        let text = client.request_api(method.clone(), &endpoint, None)?;
+        let page: Value = serde_json::from_str(&text)?;
+        if let Some(values) = page.get("values").and_then(Value::as_array) {
+            all.extend(values.iter().cloned());
+        }
+        match page.get("next").and_then(Value::as_str) {
+            Some(next) => endpoint = strip_api_base(next),
+            None => break,
+        }
+    }
+    let merged = Value::Array(all);
+    match serde_json::to_string_pretty(&merged) {
+        Ok(pretty) => println!("{pretty}"),
+        Err(_) => println!("{merged}"),
+    }
+    Ok(())
+}
+
+/// The `next` link is a full URL; reduce it to the path after `/2.0` so the
+/// client's base-URL prefixing applies uniformly.
+fn strip_api_base(next: &str) -> String {
+    match next.find("/2.0") {
+        Some(idx) => next[idx + "/2.0".len()..].to_string(),
+        None => next.to_string(),
+    }
 }
 
 /// Resolve placeholders and normalize the endpoint path.
@@ -127,6 +165,7 @@ mod tests {
             method: None,
             fields: fields.iter().map(|s| s.to_string()).collect(),
             input: input.map(str::to_string),
+            paginate: false,
         }
     }
 
