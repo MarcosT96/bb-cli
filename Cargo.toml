@@ -1,6 +1,6 @@
 [package]
 name = "bb-cli"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 description = "Bitbucket Cloud CLI"
 license = "MIT"
@@ -25,6 +25,9 @@ open = "5"
 self-replace = "1"
 semver = "1"
 tempfile = "3"
+rmcp = { version = "2.2.0", features = ["macros", "schemars", "server", "transport-io"] }
+tokio = { version = "1.53.1", features = ["rt-multi-thread", "macros", "io-std"] }
+schemars = "1"
 
 [dev-dependencies]
 assert_cmd = "2"

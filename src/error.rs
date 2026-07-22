@@ -34,9 +34,11 @@ pub enum AppError {
     #[error("{0}")]
     Api(String),
 
-    /// Any other non-2xx (and non-409) status.
-    #[error("An error occurred, status code: {0}")]
-    Status(u16),
+    /// Any other non-2xx (and non-409) status. Carries the status code and the
+    /// response body so the caller can surface it (instead of the client
+    /// printing to stdout, which would corrupt the MCP JSON-RPC stream).
+    #[error("An error occurred, status code: {0}\n{1}")]
+    Status(u16, String),
 
     /// Repo path could not be resolved.
     #[error("{0}")]

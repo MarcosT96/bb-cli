@@ -39,6 +39,7 @@ fn run(cli: Cli) -> Result<()> {
         Command::Api(args) => commands::api::run(args, &cli.global),
         Command::Alias(args) => commands::alias::run(args),
         Command::Extension(args) => commands::extension::run(args),
+        Command::Mcp(args) => commands::mcp::run(args, &cli.global),
         Command::Auth(args) => commands::auth::run(args, &cli.global),
         Command::Branch(args) => commands::branch::run(args, &cli.global),
         Command::Browse(args) => commands::browse::run(args, &cli.global),

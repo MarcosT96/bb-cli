@@ -72,6 +72,8 @@ pub enum Command {
     Alias(AliasArgs),
     /// Manage bb extensions (bb-<name> executables).
     Extension(ExtensionArgs),
+    /// Run an MCP server exposing Bitbucket to AI assistants (stdio).
+    Mcp(McpArgs),
     /// Authentication commands.
     Auth(AuthArgs),
     /// Branch commands.
@@ -170,6 +172,20 @@ pub enum ExtensionCmd {
     /// Remove an installed extension by name.
     #[command(visible_alias = "rm")]
     Remove { name: String },
+}
+
+// ---- mcp ------------------------------------------------------------------
+
+#[derive(Debug, Args)]
+pub struct McpArgs {
+    #[command(subcommand)]
+    pub cmd: Option<McpCmd>,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum McpCmd {
+    /// Serve the MCP server over stdio. Default action.
+    Serve,
 }
 
 // ---- auth -----------------------------------------------------------------

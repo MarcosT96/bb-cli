@@ -18,7 +18,6 @@ use serde_json::Value;
 
 use crate::config;
 use crate::error::{AppError, Result};
-use crate::output;
 use crate::repo;
 
 const API_BASE: &str = "https://api.bitbucket.org/2.0";
@@ -152,10 +151,11 @@ impl Client {
             if status.as_u16() == 401 {
                 return Err(AppError::Unauthorized);
             }
-            // 409 is tolerated (matches the PHP allowlist).
+            // 409 is tolerated (matches the PHP allowlist). Carry the body in
+            // the error rather than printing it — printing to stdout here would
+            // corrupt the MCP JSON-RPC stream.
             if status.as_u16() != 409 {
-                output::line(&body, "white");
-                return Err(AppError::Status(status.as_u16()));
+                return Err(AppError::Status(status.as_u16(), body));
             }
         }
 
