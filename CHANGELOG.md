@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0]
+
+### Added
+- **MCP server** (`bb mcp serve`) — exposes Bitbucket to AI assistants over the
+  Model Context Protocol (stdio). Tools: read-only (`pr_list`, `pr_diff`,
+  `pipeline_latest`, `branch_list`), a generic `bitbucket_api` passthrough, and
+  mutating tools (`pr_approve`, `pr_merge`, `pipeline_run`) flagged DESTRUCTIVE
+  so clients confirm before acting. Reuses the CLI's authenticated client.
+
+### Changed
+- `bb api` gained `--paginate` (follow `next` links, emit all pages as one
+  array); install.sh falls back to `~/.local/bin` robustly; CI actions bumped
+  (checkout v7, action-gh-release v3).
+
 ## [0.2.0]
 
 ### Added — coverage toward `gh` parity

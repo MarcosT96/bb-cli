@@ -70,25 +70,41 @@ newer — downloads and atomically replaces the running binary in place.
 ## Usage
 
 Run `bb --help` (or `bb <command> --help`) to see every command and its options.
-The command surface mirrors the original tool — `auth`, `branch`, `browse`,
-`env`, `pipeline`, `pr`, `pr-details`, and `upgrade`.
+Commands include `auth`, `repo`, `pr`, `pr-details`, `issue`, `branch`,
+`pipeline`, `env`, `browse`, `snippet`, `webhook`, `key`, `search`,
+`workspace`, `alias`, `extension`, `upgrade`, and the generic `api` passthrough
+(`bb api <endpoint>` reaches any Bitbucket REST endpoint).
+
+## MCP server
+
+`bb` doubles as a [Model Context Protocol](https://modelcontextprotocol.io)
+server, exposing Bitbucket to AI assistants (Claude, etc.). Run it over stdio:
+
+```sh
+bb mcp serve
+```
+
+To use it with Claude Code, register it as an MCP server pointing at the `bb`
+binary with `mcp serve` as its argument. The server exposes read-only tools
+(`pr_list`, `pr_diff`, `pipeline_latest`, `branch_list`), a generic
+`bitbucket_api` passthrough, and mutating tools (`pr_approve`, `pr_merge`,
+`pipeline_run`) whose descriptions are explicitly flagged **DESTRUCTIVE** so the
+assistant asks before acting. All tools reuse the same authenticated client as
+the CLI, so `bb auth save` is the only setup needed.
 
 ## Roadmap
 
-The rewrite to a dependency-free Rust binary is the foundation for where this
-project is headed. The direction — not a set of dated promises, but the way we
-want to grow it:
+A dependency-free Rust binary that's also an MCP server is the foundation.
+Where the project is headed — direction, not dated promises:
 
-- **An MCP server.** Expose Bitbucket to AI assistants through the
-  [Model Context Protocol](https://modelcontextprotocol.io), so tools like
-  Claude can read PRs, inspect pipelines, and act on a repo through a safe,
-  typed interface — reusing the same client this CLI is built on.
-- **AI-assisted workflows.** Summarizing pull requests and review threads,
-  drafting PR descriptions, triaging pipeline failures, and surfacing what needs
-  attention across a repo.
+- **Deeper AI-assisted workflows.** Building on the MCP server: summarizing
+  pull requests and review threads, drafting PR descriptions, triaging pipeline
+  failures, and surfacing what needs attention across a repo.
 - **Broader Bitbucket coverage.** More of the Bitbucket API surface —
-  deployments, repository and project administration, webhooks, permissions,
-  and other endpoints not yet wrapped.
+  deployments, project administration, permissions, and endpoints not yet
+  wrapped in a dedicated command (the `bb api` passthrough covers them in the
+  meantime).
+- **More MCP tools.** Extending the server as the command surface grows.
 
 Ideas and contributions in these directions are very welcome — open an issue to
 start a conversation.

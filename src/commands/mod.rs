@@ -9,6 +9,7 @@ pub mod env;
 pub mod extension;
 pub mod issue;
 pub mod key;
+pub mod mcp;
 pub mod pipeline;
 pub mod pr;
 pub mod pr_details;
