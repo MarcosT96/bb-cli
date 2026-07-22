@@ -125,6 +125,11 @@ pub struct ApiArgs {
     /// Read the request body from a JSON file (or "-" for stdin).
     #[arg(long)]
     pub input: Option<String>,
+
+    /// Follow `next` links and output every page's values as one JSON array
+    /// (GET collections only).
+    #[arg(long)]
+    pub paginate: bool,
 }
 
 // ---- alias ----------------------------------------------------------------
