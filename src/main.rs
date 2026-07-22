@@ -35,6 +35,7 @@ fn run(cli: Cli) -> Result<()> {
         Command::Branch(args) => commands::branch::run(args, &cli.global),
         Command::Browse(args) => commands::browse::run(args, &cli.global),
         Command::Env(args) => commands::env::run(args, &cli.global),
+        Command::Issue(args) => commands::issue::run(args, &cli.global),
         Command::Pipeline(args) => commands::pipeline::run(args, &cli.global),
         Command::Pr(args) => commands::pr::run(args, &cli.global),
         Command::Repo(args) => commands::repo::run(args, &cli.global),
