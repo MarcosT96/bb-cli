@@ -61,6 +61,12 @@ pub enum Command {
     Pr(PrArgs),
     /// Repository commands.
     Repo(RepoArgs),
+    /// Snippet commands.
+    Snippet(SnippetArgs),
+    /// Webhook commands.
+    Webhook(WebhookArgs),
+    /// SSH key commands.
+    Key(KeyArgs),
     /// Pull request details (comments).
     #[command(name = "pr-details")]
     PrDetails(PrDetailsArgs),
@@ -357,6 +363,73 @@ pub enum RepoCmd {
         #[arg(long)]
         yes: bool,
     },
+}
+
+// ---- snippet --------------------------------------------------------------
+
+#[derive(Debug, Args)]
+pub struct SnippetArgs {
+    #[command(subcommand)]
+    pub cmd: Option<SnippetCmd>,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum SnippetCmd {
+    /// List snippets in a workspace. Default action.
+    #[command(visible_alias = "l")]
+    List { workspace: Option<String> },
+    /// View a snippet.
+    #[command(visible_alias = "v")]
+    View { workspace: String, id: String },
+}
+
+// ---- webhook --------------------------------------------------------------
+
+#[derive(Debug, Args)]
+pub struct WebhookArgs {
+    #[command(subcommand)]
+    pub cmd: Option<WebhookCmd>,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum WebhookCmd {
+    /// List a repository's webhooks. Default action.
+    #[command(visible_alias = "l")]
+    List,
+    /// Create a webhook.
+    Create {
+        url: String,
+        /// Events to subscribe to (repeatable). Default: repo:push.
+        #[arg(long = "event")]
+        events: Vec<String>,
+    },
+    /// Delete a webhook by uuid.
+    #[command(visible_alias = "rm")]
+    Delete { uuid: String },
+}
+
+// ---- key ------------------------------------------------------------------
+
+#[derive(Debug, Args)]
+pub struct KeyArgs {
+    #[command(subcommand)]
+    pub cmd: Option<KeyCmd>,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum KeyCmd {
+    /// List your account's SSH keys. Default action.
+    #[command(visible_alias = "l")]
+    List,
+    /// Add an SSH key (from a public key string).
+    Add {
+        key: String,
+        #[arg(long)]
+        label: Option<String>,
+    },
+    /// Delete an SSH key by uuid.
+    #[command(visible_alias = "rm")]
+    Delete { uuid: String },
 }
 
 // ---- pr-details -----------------------------------------------------------
