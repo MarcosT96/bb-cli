@@ -109,3 +109,58 @@ fn field(value: &Value, key: &str) -> String {
         Some(other) => other.to_string(),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use httpmock::prelude::*;
+
+    fn client(server: &MockServer) -> Client {
+        Client::with_base(
+            &server.base_url(),
+            "me@example.com",
+            "tok",
+            Some("acme/widgets".to_string()),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn create_posts_title_and_body() {
+        let server = MockServer::start();
+        let mock = server.mock(|when, then| {
+            when.method(POST)
+                .path("/repositories/acme/widgets/issues")
+                .json_body(json!({ "title": "Bug", "content": { "raw": "it broke" } }));
+            then.status(201).json_body(json!({ "id": 5 }));
+        });
+        create(&client(&server), "Bug", Some("it broke")).unwrap();
+        mock.assert();
+    }
+
+    #[test]
+    fn create_without_body_omits_content() {
+        let server = MockServer::start();
+        let mock = server.mock(|when, then| {
+            when.method(POST)
+                .path("/repositories/acme/widgets/issues")
+                .json_body(json!({ "title": "Just a title" }));
+            then.status(201).json_body(json!({ "id": 6 }));
+        });
+        create(&client(&server), "Just a title", None).unwrap();
+        mock.assert();
+    }
+
+    #[test]
+    fn close_puts_state_closed() {
+        let server = MockServer::start();
+        let mock = server.mock(|when, then| {
+            when.method(PUT)
+                .path("/repositories/acme/widgets/issues/5")
+                .json_body(json!({ "state": "closed" }));
+            then.status(200).json_body(json!({ "id": 5 }));
+        });
+        close(&client(&server), 5).unwrap();
+        mock.assert();
+    }
+}

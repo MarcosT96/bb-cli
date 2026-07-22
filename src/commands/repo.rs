@@ -180,3 +180,61 @@ fn field(value: &Value, key: &str) -> String {
         Some(other) => other.to_string(),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use httpmock::prelude::*;
+
+    fn client(server: &MockServer) -> Client {
+        Client::with_base(&server.base_url(), "me@example.com", "tok", None).unwrap()
+    }
+
+    #[test]
+    fn create_posts_private_by_default() {
+        let server = MockServer::start();
+        let mock = server.mock(|when, then| {
+            when.method(POST)
+                .path("/repositories/acme/new-repo")
+                .json_body(json!({ "is_private": true, "scm": "git" }));
+            then.status(200).json_body(json!({
+                "full_name": "acme/new-repo",
+                "links": { "html": { "href": "https://bitbucket.org/acme/new-repo" } }
+            }));
+        });
+        create(&client(&server), "acme/new-repo", false).unwrap();
+        mock.assert();
+    }
+
+    #[test]
+    fn create_public_flips_is_private() {
+        let server = MockServer::start();
+        let mock = server.mock(|when, then| {
+            when.method(POST)
+                .path("/repositories/acme/pub-repo")
+                .json_body(json!({ "is_private": false, "scm": "git" }));
+            then.status(200)
+                .json_body(json!({ "full_name": "acme/pub-repo" }));
+        });
+        create(&client(&server), "acme/pub-repo", true).unwrap();
+        mock.assert();
+    }
+
+    #[test]
+    fn create_without_slash_is_usage_error() {
+        let server = MockServer::start();
+        let err = create(&client(&server), "noslash", false).unwrap_err();
+        assert!(matches!(err, AppError::Usage(_)));
+    }
+
+    #[test]
+    fn delete_with_yes_sends_delete() {
+        let server = MockServer::start();
+        let mock = server.mock(|when, then| {
+            when.method(DELETE).path("/repositories/acme/old-repo");
+            then.status(204);
+        });
+        delete(&client(&server), "acme/old-repo", true).unwrap();
+        mock.assert();
+    }
+}
