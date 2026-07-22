@@ -41,6 +41,9 @@ fn run(cli: Cli) -> Result<()> {
         Command::Pipeline(args) => commands::pipeline::run(args, &cli.global),
         Command::Pr(args) => commands::pr::run(args, &cli.global),
         Command::Repo(args) => commands::repo::run(args, &cli.global),
+        Command::Snippet(args) => commands::snippet::run(args, &cli.global),
+        Command::Webhook(args) => commands::webhook::run(args, &cli.global),
+        Command::Key(args) => commands::key::run(args, &cli.global),
         Command::PrDetails(args) => commands::pr_details::run(args, &cli.global),
         Command::Upgrade(args) => commands::upgrade::run(args, &cli.global),
     }
