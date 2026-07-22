@@ -168,3 +168,53 @@ fn path_str(value: &Value, path: &[&str]) -> String {
         other => other.to_string(),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use httpmock::prelude::*;
+
+    fn client(server: &MockServer) -> Client {
+        Client::with_base(
+            &server.base_url(),
+            "me@example.com",
+            "tok",
+            Some("acme/widgets".to_string()),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn run_posts_branch_target() {
+        let server = MockServer::start();
+        let mock = server.mock(|when, then| {
+            when.method(POST)
+                .path("/repositories/acme/widgets/pipelines/")
+                .json_body(json!({
+                    "target": {
+                        "ref_type": "branch",
+                        "type": "pipeline_ref_target",
+                        "ref_name": "main"
+                    }
+                }));
+            then.status(201).json_body(json!({ "build_number": 42 }));
+        });
+        run_pipeline(&client(&server), "main").unwrap();
+        mock.assert();
+    }
+
+    #[test]
+    fn latest_id_reads_size_field() {
+        // The `latest` id derivation reads the collection `size` (preserved quirk).
+        let server = MockServer::start();
+        let mock = server.mock(|when, then| {
+            when.method(GET)
+                .path("/repositories/acme/widgets/pipelines/");
+            then.status(200)
+                .json_body(json!({ "size": 3, "values": [] }));
+        });
+        let id = latest_pipeline_id(&client(&server)).unwrap();
+        mock.assert();
+        assert_eq!(id, 3);
+    }
+}

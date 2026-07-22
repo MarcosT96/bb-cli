@@ -301,3 +301,79 @@ fn prompt(question: &str) -> Result<String> {
         .interact_text()?;
     Ok(input)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use httpmock::prelude::*;
+
+    fn client(server: &MockServer) -> Client {
+        Client::with_base(
+            &server.base_url(),
+            "me@example.com",
+            "tok",
+            Some("acme/widgets".to_string()),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn merge_posts_to_the_merge_endpoint() {
+        let server = MockServer::start();
+        let mock = server.mock(|when, then| {
+            when.method(POST)
+                .path("/repositories/acme/widgets/pullrequests/7/merge");
+            then.status(200)
+                .json_body(serde_json::json!({ "state": "MERGED" }));
+        });
+        merge(&client(&server), 7).unwrap();
+        mock.assert();
+    }
+
+    #[test]
+    fn approve_with_zero_lists_then_approves_each() {
+        let server = MockServer::start();
+        // 0 = approve all open PRs → first a list, then one approve per id.
+        let list = server.mock(|when, then| {
+            when.method(GET)
+                .path("/repositories/acme/widgets/pullrequests");
+            then.status(200)
+                .json_body(serde_json::json!({ "values": [{ "id": 1 }, { "id": 2 }] }));
+        });
+        let approve1 = server.mock(|when, then| {
+            when.method(POST)
+                .path("/repositories/acme/widgets/pullrequests/1/approve");
+            then.status(200).json_body(serde_json::json!({}));
+        });
+        let approve2 = server.mock(|when, then| {
+            when.method(POST)
+                .path("/repositories/acme/widgets/pullrequests/2/approve");
+            then.status(200).json_body(serde_json::json!({}));
+        });
+
+        approve(&client(&server), vec![0]).unwrap();
+
+        list.assert();
+        approve1.assert();
+        approve2.assert();
+    }
+
+    #[test]
+    fn approve_empty_is_usage_error() {
+        let server = MockServer::start();
+        let err = approve(&client(&server), vec![]).unwrap_err();
+        assert!(matches!(err, AppError::Usage(_)));
+    }
+
+    #[test]
+    fn decline_posts_and_reports_ok() {
+        let server = MockServer::start();
+        let mock = server.mock(|when, then| {
+            when.method(POST)
+                .path("/repositories/acme/widgets/pullrequests/9/decline");
+            then.status(200).json_body(serde_json::json!({}));
+        });
+        decline(&client(&server), 9).unwrap();
+        mock.assert();
+    }
+}
