@@ -9,6 +9,31 @@
 
 use clap::{Args, Parser, Subcommand};
 
+/// Canonical list of built-in top-level command names. The single source of
+/// truth used by the alias and extension dispatchers to avoid shadowing a real
+/// command. Keep in sync with the `Command` enum below.
+pub const BUILTIN_COMMANDS: &[&str] = &[
+    "api",
+    "alias",
+    "auth",
+    "branch",
+    "browse",
+    "env",
+    "extension",
+    "issue",
+    "key",
+    "pipeline",
+    "pr",
+    "pr-details",
+    "repo",
+    "search",
+    "snippet",
+    "upgrade",
+    "webhook",
+    "workspace",
+    "help",
+];
+
 #[derive(Debug, Parser)]
 #[command(name = "bb", version, about = "Bitbucket Cloud CLI")]
 pub struct Cli {
@@ -45,6 +70,8 @@ pub enum Command {
     Api(ApiArgs),
     /// Define command shortcuts.
     Alias(AliasArgs),
+    /// Manage bb extensions (bb-<name> executables).
+    Extension(ExtensionArgs),
     /// Authentication commands.
     Auth(AuthArgs),
     /// Branch commands.
@@ -118,6 +145,26 @@ pub enum AliasCmd {
     /// Delete an alias.
     #[command(visible_alias = "rm")]
     Delete { name: String },
+}
+
+// ---- extension ------------------------------------------------------------
+
+#[derive(Debug, Args)]
+pub struct ExtensionArgs {
+    #[command(subcommand)]
+    pub cmd: Option<ExtensionCmd>,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum ExtensionCmd {
+    /// List installed extensions. Default action.
+    #[command(visible_alias = "l")]
+    List,
+    /// Install an extension by git URL or owner/repo (repo named bb-<name>).
+    Install { source: String },
+    /// Remove an installed extension by name.
+    #[command(visible_alias = "rm")]
+    Remove { name: String },
 }
 
 // ---- auth -----------------------------------------------------------------
