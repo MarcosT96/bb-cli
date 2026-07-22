@@ -1,5 +1,9 @@
 # bb — Bitbucket CLI
 
+[![Latest release](https://img.shields.io/github/v/release/MarcosT96/bb-cli?sort=semver)](https://github.com/MarcosT96/bb-cli/releases/latest)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Built with Rust](https://img.shields.io/badge/built%20with-Rust-000?logo=rust)](https://www.rust-lang.org)
+
 Use Bitbucket from the command line: browse pull requests, pipelines, branches,
 deployment environments and more, straight from your terminal.
 
