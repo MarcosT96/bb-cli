@@ -5,28 +5,10 @@
 //! command. The expansion supports `$1..$N` positional placeholders; any
 //! leftover arguments the template doesn't consume are appended.
 
-use crate::cli::{AliasArgs, AliasCmd};
+use crate::cli::{AliasArgs, AliasCmd, BUILTIN_COMMANDS as BUILTINS};
 use crate::config;
 use crate::error::Result;
 use crate::output;
-
-/// Built-in command names an alias must not shadow. Kept in sync with the
-/// `Command` enum in `cli.rs`.
-const BUILTINS: &[&str] = &[
-    "api",
-    "alias",
-    "auth",
-    "branch",
-    "browse",
-    "env",
-    "issue",
-    "pipeline",
-    "pr",
-    "pr-details",
-    "repo",
-    "upgrade",
-    "help",
-];
 
 pub fn run(args: AliasArgs) -> Result<()> {
     match args.cmd.unwrap_or(AliasCmd::List) {

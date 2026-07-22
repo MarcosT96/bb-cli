@@ -6,6 +6,7 @@ pub mod auth;
 pub mod branch;
 pub mod browse;
 pub mod env;
+pub mod extension;
 pub mod issue;
 pub mod key;
 pub mod pipeline;

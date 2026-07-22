@@ -21,6 +21,11 @@ use error::Result;
 
 fn main() {
     let argv = commands::alias::expand_argv(std::env::args().collect());
+
+    // Before clap parsing, hand off to an installed extension if the first
+    // token names one (and isn't a built-in). This never returns on success.
+    commands::extension::maybe_dispatch(&argv);
+
     let cli = Cli::parse_from(argv);
 
     if let Err(err) = run(cli) {
@@ -33,6 +38,7 @@ fn run(cli: Cli) -> Result<()> {
     match cli.command {
         Command::Api(args) => commands::api::run(args, &cli.global),
         Command::Alias(args) => commands::alias::run(args),
+        Command::Extension(args) => commands::extension::run(args),
         Command::Auth(args) => commands::auth::run(args, &cli.global),
         Command::Branch(args) => commands::branch::run(args, &cli.global),
         Command::Browse(args) => commands::browse::run(args, &cli.global),
