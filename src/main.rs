@@ -30,6 +30,7 @@ fn main() {
 
 fn run(cli: Cli) -> Result<()> {
     match cli.command {
+        Command::Api(args) => commands::api::run(args, &cli.global),
         Command::Auth(args) => commands::auth::run(args, &cli.global),
         Command::Branch(args) => commands::branch::run(args, &cli.global),
         Command::Browse(args) => commands::browse::run(args, &cli.global),

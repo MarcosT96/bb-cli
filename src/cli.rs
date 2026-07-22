@@ -41,6 +41,8 @@ pub struct GlobalArgs {
 
 #[derive(Debug, Subcommand)]
 pub enum Command {
+    /// Make an authenticated request to any Bitbucket API endpoint.
+    Api(ApiArgs),
     /// Authentication commands.
     Auth(AuthArgs),
     /// Branch commands.
@@ -58,6 +60,28 @@ pub enum Command {
     PrDetails(PrDetailsArgs),
     /// Upgrade bb to the latest release.
     Upgrade(UpgradeArgs),
+}
+
+// ---- api ------------------------------------------------------------------
+
+#[derive(Debug, Args)]
+pub struct ApiArgs {
+    /// API endpoint, e.g. "/repositories/{workspace}/{repo}/pullrequests" or
+    /// "user". A leading "/2.0" is added if absent. The placeholders {repo}
+    /// (owner/repo) and {workspace} are substituted from the current repo.
+    pub endpoint: String,
+
+    /// HTTP method (GET by default; defaults to POST when --field is given).
+    #[arg(short = 'X', long = "method")]
+    pub method: Option<String>,
+
+    /// Add a JSON body field as key=value (repeatable). Implies POST.
+    #[arg(short = 'f', long = "field")]
+    pub fields: Vec<String>,
+
+    /// Read the request body from a JSON file (or "-" for stdin).
+    #[arg(long)]
+    pub input: Option<String>,
 }
 
 // ---- auth -----------------------------------------------------------------
