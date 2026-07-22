@@ -55,6 +55,8 @@ pub enum Command {
     Pipeline(PipelineArgs),
     /// Pull request commands.
     Pr(PrArgs),
+    /// Repository commands.
+    Repo(RepoArgs),
     /// Pull request details (comments).
     #[command(name = "pr-details")]
     PrDetails(PrDetailsArgs),
@@ -254,6 +256,48 @@ pub enum PrCmd {
         pr_id: u32,
         #[arg(default_value_t = false)]
         unresolved: bool,
+    },
+}
+
+// ---- repo -----------------------------------------------------------------
+
+#[derive(Debug, Args)]
+pub struct RepoArgs {
+    #[command(subcommand)]
+    pub cmd: Option<RepoCmd>,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum RepoCmd {
+    /// List repositories in a workspace. Default action.
+    #[command(visible_alias = "l")]
+    List {
+        /// Workspace slug (defaults to the current repo's workspace).
+        workspace: Option<String>,
+    },
+    /// View a repository's details.
+    #[command(visible_alias = "v")]
+    View {
+        /// owner/repo (defaults to the current repo).
+        repo: Option<String>,
+    },
+    /// Create a repository (owner/name).
+    Create {
+        full_name: String,
+        /// Make the repository private (default: private).
+        #[arg(long)]
+        public: bool,
+    },
+    /// Clone a repository (owner/repo) via git.
+    Clone { repo: String },
+    /// Fork a repository (defaults to the current repo).
+    Fork { repo: Option<String> },
+    /// Delete a repository (owner/repo).
+    Delete {
+        repo: String,
+        /// Skip the confirmation prompt.
+        #[arg(long)]
+        yes: bool,
     },
 }
 
