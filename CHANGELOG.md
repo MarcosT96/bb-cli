@@ -4,9 +4,25 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-### Add
-- `bb pr show` command for viewing PR comments with inline code comment support
-  Usage: bb pr show <pr_id> [limit] [unresolved]
+### Changed
+- **Rewrite from PHP to Rust.** `bb` is now a single static binary with no
+  runtime dependency, distributed as prebuilt per-platform binaries.
+- **Authentication migrated to Atlassian API tokens** (Basic `email:apiToken`),
+  replacing the removed Bitbucket app passwords. Legacy app-password configs are
+  detected and prompt re-authentication.
+- Release pipeline now cross-compiles macOS (arm64/x86_64) and Linux
+  (x86_64/aarch64) binaries; `bb upgrade` selects the matching asset. Docker
+  image and PHAR build removed.
+
+### Added
+- `bb pr show` command for viewing PR comments with inline code comment support.
+  Usage: `bb pr show <pr_id> [unresolved]`
+
+---
+
+## PHP releases (original bb-cli)
+
+The entries below are from the original PHP project this tool was ported from.
 
 ---
 

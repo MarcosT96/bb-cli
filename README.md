@@ -1,10 +1,18 @@
-# Bitbucket Rest API CLI
+# bb — Bitbucket CLI
 
-Use Bitbucket from command line. With this app you can see pull request, pipelines, branches etc. from your terminal.
+Use Bitbucket from the command line: browse pull requests, pipelines, branches,
+deployment environments and more, straight from your terminal.
 
 ![Bitbucket CLI](ss.gif)
 
-`bb` is a single static binary — no runtime to install.
+`bb` is a single static binary written in Rust — no runtime to install, no
+dependencies to manage. It authenticates with Atlassian API tokens (the
+replacement for the now-removed Bitbucket app passwords).
+
+> **Heads up:** this is a Rust rewrite of the original PHP `bb-cli`. The commands
+> and config file are compatible, but authentication now uses an Atlassian API
+> token **with Bitbucket scopes** instead of an app password. See
+> [Acknowledgements](#acknowledgements) for the project's history.
 
 ## Installation
 
@@ -61,12 +69,46 @@ newer — downloads and atomically replaces the running binary in place.
 
 ## Usage
 
-[View the documentation](https://bb-cli.github.io) for usage information.
+Run `bb --help` (or `bb <command> --help`) to see every command and its options.
+The command surface mirrors the original tool — `auth`, `branch`, `browse`,
+`env`, `pipeline`, `pr`, `pr-details`, and `upgrade`.
 
-## Development
+## Roadmap
 
-This tool developed with help of [Github Copilot](https://copilot.github.com) :octocat: - 2021
+The rewrite to a dependency-free Rust binary is the foundation for where this
+project is headed. The direction — not a set of dated promises, but the way we
+want to grow it:
+
+- **An MCP server.** Expose Bitbucket to AI assistants through the
+  [Model Context Protocol](https://modelcontextprotocol.io), so tools like
+  Claude can read PRs, inspect pipelines, and act on a repo through a safe,
+  typed interface — reusing the same client this CLI is built on.
+- **AI-assisted workflows.** Summarizing pull requests and review threads,
+  drafting PR descriptions, triaging pipeline failures, and surfacing what needs
+  attention across a repo.
+- **Broader Bitbucket coverage.** More of the Bitbucket API surface —
+  deployments, repository and project administration, webhooks, permissions,
+  and other endpoints not yet wrapped.
+
+Ideas and contributions in these directions are very welcome — open an issue to
+start a conversation.
+
+## Acknowledgements
+
+This project stands on the shoulders of the original **[bb-cli](https://github.com/bb-cli/bb-cli)**,
+a PHP tool created and maintained by **Semih Erdoğan**, with significant work by
+**Dinçer Demircioğlu** and contributions from **Erşan Işık**, **Celal Akyüz**,
+and others. Their design — the command structure, the config format, and the
+overall UX — shaped this tool directly; the Rust version is a faithful port of
+their work, undertaken to drop the runtime dependency and adopt Bitbucket's new
+API-token authentication. Thank you for building the original and sharing it
+openly. 🙏
+
+## Contributing
+
+Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE) for more information.
+The MIT License (MIT). Please see [the License file](LICENSE) for more
+information.
