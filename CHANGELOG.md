@@ -2,12 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.3.1]
 
 ### Added
 - `bb env create <name> [--env-type Test|Staging|Production]` — create a
   deployment environment (requires an `admin:pipeline:bitbucket` token).
   Resolves a long-standing gap from the original project (issue bb-cli/bb-cli#24).
+
+### Changed
+- Test coverage: the HTTP client's auth/error ladder is now covered by
+  `httpmock` integration tests (Basic auth header, 401/409/type=error/status).
 
 ## [0.3.0]
 
