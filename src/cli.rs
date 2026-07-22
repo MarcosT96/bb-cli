@@ -67,6 +67,10 @@ pub enum Command {
     Webhook(WebhookArgs),
     /// SSH key commands.
     Key(KeyArgs),
+    /// Search repositories.
+    Search(SearchArgs),
+    /// Workspace commands.
+    Workspace(WorkspaceArgs),
     /// Pull request details (comments).
     #[command(name = "pr-details")]
     PrDetails(PrDetailsArgs),
@@ -430,6 +434,44 @@ pub enum KeyCmd {
     /// Delete an SSH key by uuid.
     #[command(visible_alias = "rm")]
     Delete { uuid: String },
+}
+
+// ---- search ---------------------------------------------------------------
+
+#[derive(Debug, Args)]
+pub struct SearchArgs {
+    #[command(subcommand)]
+    pub cmd: Option<SearchCmd>,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum SearchCmd {
+    /// Search repositories in a workspace by name substring. Default action.
+    #[command(visible_alias = "r")]
+    Repos {
+        query: String,
+        /// Workspace to search (defaults to the current repo's workspace).
+        #[arg(long)]
+        workspace: Option<String>,
+    },
+}
+
+// ---- workspace ------------------------------------------------------------
+
+#[derive(Debug, Args)]
+pub struct WorkspaceArgs {
+    #[command(subcommand)]
+    pub cmd: Option<WorkspaceCmd>,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum WorkspaceCmd {
+    /// List workspaces you belong to. Default action.
+    #[command(visible_alias = "l")]
+    List,
+    /// List a workspace's projects.
+    #[command(visible_alias = "p")]
+    Projects { workspace: Option<String> },
 }
 
 // ---- pr-details -----------------------------------------------------------

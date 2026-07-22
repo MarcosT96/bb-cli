@@ -12,6 +12,8 @@ pub mod pipeline;
 pub mod pr;
 pub mod pr_details;
 pub mod repo;
+pub mod search;
 pub mod snippet;
 pub mod upgrade;
 pub mod webhook;
+pub mod workspace;
