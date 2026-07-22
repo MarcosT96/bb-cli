@@ -2,7 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.2.0]
+
+### Added — coverage toward `gh` parity
+- `bb api <endpoint>` — authenticated passthrough to any Bitbucket REST
+  endpoint, with `{repo}`/`{workspace}` placeholders, `-f key=value` body
+  fields, and `--input`.
+- `bb repo` — list/view/create/clone/fork/delete.
+- `bb issue` — list/view/create/comment/close.
+- `bb alias` — local command shortcuts with `$1..$N` expansion.
+- `bb snippet` — list/view. `bb webhook` — list/create/delete.
+  `bb key` — SSH keys list/add/delete.
+- `bb search repos` — repository search within a workspace.
+- `bb workspace` — list workspaces and their projects.
+- `bb extension` — plugin system: `bb <name>` runs a `bb-<name>` executable
+  from `~/.bb/extensions`; install/list/remove.
+
+## [0.1.0]
 
 ### Changed
 - **Rewrite from PHP to Rust.** `bb` is now a single static binary with no
