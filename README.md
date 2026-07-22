@@ -4,33 +4,60 @@ Use Bitbucket from command line. With this app you can see pull request, pipelin
 
 ![Bitbucket CLI](ss.gif)
 
+`bb` is a single static binary — no runtime to install.
+
 ## Installation
 
-__NOTE__: Before install this package, you should have **PHP >= 7** installed on your machine. For an alternative, use Docker instructions below.
+### 1. Install script (recommended)
 
-* Download standalone binary from [releases](https://github.com/bb-cli/bb-cli/releases)
-* Move downloaded file to path like `mv bb /usr/local/bin/bb` or `mv bb ~/.local/bin/bb`
-* For testing `bb help`
-* Let's move on to the [auth.](https://bb-cli.github.io/authentication)
+One-liner that detects your OS/arch and installs the latest release binary:
 
-## Docker Setup
-As an alternative to having a PHP runtime installed locally, you can make use of a Docker container to run Bitbucket CLI.
-First, make sure to create `~/.bitbucket-rest-cli-config.json` beforehand:
-```shell
-touch ~/.bitbucket-rest-cli-config.json
+```sh
+curl -fsSL https://raw.githubusercontent.com/MarcosT96/bb-cli/main/install.sh | sh
 ```
 
-Then, run the tool:
-```shell
-docker run -it --rm --mount type=bind,source="$HOME/.bitbucket-rest-cli-config.json",target=/root/.bitbucket-rest-cli-config.json --mount type=bind,source="$(pwd)",target=/workdir,readonly ghcr.io/bb-cli/bb-cli help
+Installs `bb` to `/usr/local/bin` (or `~/.local/bin` if that isn't writable —
+make sure it's on your `PATH`). Prebuilt binaries are provided for:
+
+- macOS (Apple Silicon & Intel)
+- Linux (x86_64 & aarch64)
+
+### 2. From source with Cargo
+
+Requires a Rust toolchain ([rustup](https://rustup.rs)):
+
+```sh
+# From a clone
+cargo install --path .
+
+# Or straight from git
+cargo install --git https://github.com/MarcosT96/bb-cli
 ```
 
-For ease, configure this as an alias in your chosen shell:
-```shell
-alias bb='docker run -it --rm --mount type=bind,source="$HOME/.bitbucket-rest-cli-config.json",target=/root/.bitbucket-rest-cli-config.json --mount type=bind,source="$(pwd)",target=/workdir,readonly ghcr.io/bb-cli/bb-cli'
+### 3. Download a binary manually
+
+Grab the asset for your platform from the
+[latest release](https://github.com/MarcosT96/bb-cli/releases/latest),
+named `bb-<target>` (e.g. `bb-aarch64-apple-darwin`), then:
+
+```sh
+chmod +x bb-<target>
+mv bb-<target> /usr/local/bin/bb
 ```
 
-Then use `bb help` and `bb auth` as expected in the documentation.
+Then run `bb --help`, and set up authentication with `bb auth save`
+(you'll need an Atlassian API token created **with Bitbucket scopes**).
+
+### Updating
+
+Once installed, `bb` self-updates:
+
+```sh
+bb upgrade
+```
+
+This checks the latest GitHub release, compares versions with semver, and — if
+newer — downloads and atomically replaces the running binary in place.
 
 ## Usage
 
